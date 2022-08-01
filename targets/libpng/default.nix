@@ -1,8 +1,7 @@
-{
-  pkgs,
-  llvmPkgs,
-  stdenv,
-  deps,
+{ pkgs
+, llvmPkgs
+, stdenv
+, deps
 }:
 
 stdenv.mkDerivation {
@@ -25,6 +24,14 @@ stdenv.mkDerivation {
 
   preConfigure = ''
     export CFLAGS="$CFLAGS -flto"
+    export CXXFLAGS="$CFlAGS"
     export LDFLAGS="$LDFLAGS -fuse-ld=lld"
+  '';
+
+  postInstall = ''
+    echo "#include <stdlib.h>" > $out/libpng_read_fuzzer.cc
+    cat $src/contrib/oss-fuzz/libpng_read_fuzzer.cc >> $out/libpng_read_fuzzer.cc
+    $CXX $CXXFLAGS -fsanitize=fuzzer -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer -lz $LDFLAGS \
+      $out/lib/libpng16.a $out/libpng_read_fuzzer.cc
   '';
 }
