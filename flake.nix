@@ -11,9 +11,15 @@
         stdenv = llvmPkgs.stdenv;
         deps = import ./deps.nix { inherit pkgs llvmPkgs stdenv; };
       in
+      with pkgs;
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          libpng = import ./targets/libpng { inherit pkgs llvmPkgs stdenv deps; };
+          afl = import ./fuzzers/afl { inherit pkgs; };
+          libpng = import ./targets/libpng {
+            inherit fetchFromGitHub zlib;
+            driver = afl.driver;
+            stdenv = afl.stdenv;
+          };
           default = libpng;
         };
       }

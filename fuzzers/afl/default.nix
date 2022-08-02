@@ -2,9 +2,8 @@
 
 let
   llvmPkgs = pkgs.llvmPackages_9;
-  stdenv = llvmPkgs.stdenv;
   clang = llvmPkgs.clang;
-  afl = stdenv.mkDerivation rec {
+  afl = llvmPkgs.stdenv.mkDerivation rec {
     name = "afl";
 
     src = pkgs.fetchFromGitHub {
@@ -16,8 +15,8 @@ let
 
     # AFL implicitly relies on which to check for `llvm-config` availability.
     buildInputs = [ llvmPkgs.llvm pkgs.which pkgs.makeWrapper ];
-
     installFlags = [ "PREFIX=$(out)" ];
+
     postBuild = ''
       make -C llvm_mode -j $NIX_BUILD_CORES
     '';
@@ -29,15 +28,27 @@ let
       cp $out/bin/afl-clang-fast $out/bin/afl-clang-fast++
       for x in $out/bin/afl-clang-fast $out/bin/afl-clang-fast++; do
         wrapProgram $x \
+          --argv0 "$x" \
           --prefix AFL_PATH : "$out/lib/afl" \
           --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
       done
     '';
+
+  };
+  afl-cc = pkgs.wrapCCWith rec {
+    cc = afl;
+    extraBuildCommands = ''
+      # Don't wrap afl-clang-fast, since it already references a wrapped clang
+      export named_cc=afl-clang-fast
+      export named_cxx=afl-clang-fast++
+
+      # Create symlinks
+      ln -s $ccPath/afl-clang-fast $out/bin/cc
+      ln -s $ccPath/afl-clang-fast++ $out/bin/c++
+    '';
   };
 in
 afl // {
-  cc = "${afl}/bin/afl-clang-fast";
-  cxx = "${afl}/bin/afl-clang-fast++";
-  lib = ./src/afl_driver.cpp;
-  inherit stdenv;
+  driver = ./src/afl_driver.cpp;
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv afl-cc;
 }
