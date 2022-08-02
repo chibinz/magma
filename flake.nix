@@ -9,13 +9,15 @@
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
         llvmPkgs = pkgs.llvmPackages_14;
         stdenv = llvmPkgs.stdenv;
-        deps = import ./deps.nix { inherit pkgs llvmPkgs stdenv; };
+        fuzzers = import ./fuzzers;
+        targets = import ./targets;
+        deps = import ./deps.nix;
       in
       with pkgs;
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          afl = import ./fuzzers/afl { inherit pkgs; };
-          libpng = import ./targets/libpng {
+          afl = fuzzers.afl { inherit pkgs; };
+          libpng = targets.libpng {
             inherit fetchFromGitHub zlib;
             driver = afl.driver;
             stdenv = afl.stdenv;
