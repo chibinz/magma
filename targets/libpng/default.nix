@@ -24,7 +24,7 @@ fuzzer.stdenv.mkDerivation {
   preConfigure = ''
     export CC=${fuzzer.cc}
     export CXX=${fuzzer.cxx}
-  '' + fuzzer.envConfigure;
+  '';
 
   postInstall = ''
     echo "#include <stdlib.h>" > $out/libpng_read_fuzzer.cc
