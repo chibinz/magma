@@ -35,7 +35,7 @@ let
     '';
 
   };
-  afl-cc = pkgs.wrapCCWith rec {
+  afl-cc = pkgs.wrapCCWith {
     cc = afl;
     extraBuildCommands = ''
       # Don't wrap afl-clang-fast, since it already references a wrapped clang

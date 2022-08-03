@@ -17,10 +17,11 @@
       rec {
         packages = flake-utils.lib.flattenTree rec {
           afl = fuzzers.afl { inherit pkgs; };
+          llvm_lto = fuzzers.llvm_lto { inherit pkgs; };
           libpng = targets.libpng {
             inherit fetchFromGitHub zlib;
-            driver = afl.driver;
-            stdenv = afl.stdenv;
+            driver = llvm_lto.driver;
+            stdenv = llvm_lto.stdenv;
           };
           default = libpng;
         };
