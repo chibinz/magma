@@ -15,11 +15,14 @@ let
 
     # AFL implicitly relies on which to check for `llvm-config` availability.
     buildInputs = [ llvmPkgs.llvm pkgs.which pkgs.makeWrapper ];
-    installFlags = [ "PREFIX=$(out)" ];
 
     postBuild = ''
       make -C llvm_mode -j $NIX_BUILD_CORES
     '';
+
+    installFlags = [ "PREFIX=$(out)" ];
+
+    driver = ./src/afl_driver.cpp;
 
     # Copy pasted from
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/afl/default.nix
@@ -32,6 +35,8 @@ let
           --prefix AFL_PATH : "$out/lib/afl" \
           --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
       done
+
+      c++ -c -std=c++11 -o $out/lib/afl/afl_driver.o ${driver}
     '';
 
   };
@@ -49,6 +54,6 @@ let
   };
 in
 afl // {
-  driver = ./src/afl_driver.cpp;
+  driver = "${afl}/lib/afl/afl_driver.o";
   stdenv = pkgs.overrideCC llvmPkgs.stdenv afl-cc;
 }
