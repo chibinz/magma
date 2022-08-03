@@ -16,12 +16,15 @@
       rec {
         packages = flake-utils.lib.flattenTree rec {
           afl = fuzzers.afl { inherit pkgs; };
+          aflplusplus = fuzzers.aflplusplus { inherit pkgs; };
           llvm_lto = fuzzers.llvm_lto { inherit pkgs; };
+
+          fuzzer = aflplusplus;
           libpng = targets.libpng {
             inherit (pkgs) fetchFromGitHub;
-            zlib = pkgs.zlib.override { stdenv = llvm_lto.stdenv; shared = false; static = true; };
-            driver = llvm_lto.driver;
-            stdenv = llvm_lto.stdenv;
+            zlib = pkgs.zlib.override { stdenv = fuzzer.stdenv; shared = false; static = true; };
+            driver = aflplusplus.driver;
+            stdenv = aflplusplus.stdenv;
           };
           default = libpng;
         };

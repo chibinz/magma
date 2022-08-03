@@ -27,7 +27,7 @@ stdenv.mkDerivation {
     cat $src/contrib/oss-fuzz/libpng_read_fuzzer.cc >> $out/libpng_read_fuzzer.cc
 
     # Link order matters here
-    c++ -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer -lz \
-      $out/libpng_read_fuzzer.cc $out/lib/libpng16.a ${driver}
+    c++ -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer \
+      $out/libpng_read_fuzzer.cc $out/lib/libpng16.a ${driver} -lz
   '';
 }
