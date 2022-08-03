@@ -13,13 +13,13 @@
         targets = import ./targets;
         deps = import ./deps.nix;
       in
-      with pkgs;
       rec {
         packages = flake-utils.lib.flattenTree rec {
           afl = fuzzers.afl { inherit pkgs; };
           llvm_lto = fuzzers.llvm_lto { inherit pkgs; };
           libpng = targets.libpng {
-            inherit fetchFromGitHub zlib;
+            inherit (pkgs) fetchFromGitHub;
+            zlib = pkgs.zlib.override { stdenv = llvm_lto.stdenv; shared = false; static = true; };
             driver = llvm_lto.driver;
             stdenv = llvm_lto.stdenv;
           };
