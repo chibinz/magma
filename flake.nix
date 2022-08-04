@@ -21,8 +21,8 @@
 
           fuzzer = aflplusplus;
 
-          libpng = targets.lua {
-            inherit (pkgs) fetchFromGitHub readline;
+          libpng = targets.openssl {
+            inherit (pkgs) fetchFromGitHub perl;
             inherit (fuzzer) stdenv driver;
           };
           default = libpng;
