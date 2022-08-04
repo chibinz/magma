@@ -1,8 +1,30 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 
 let
   llvmPkgs = pkgs.llvmPackages_9;
   clang = llvmPkgs.clang;
+
+  # Copy pasted from
+  # https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/afl/default.nix
+  aflPostInstall = clang: cc: cxx: ''
+    rm $out/bin/${cxx}
+    cp $out/bin/${cc} $out/bin/${cxx}
+    for c in $out/bin/${cc} $out/bin/${cxx}; do
+      wrapProgram $c \
+        --argv0 $c \
+        --prefix AFL_PATH : $out/lib/afl \
+        --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
+    done
+  '';
+
+  wrapCCExtraBuildCommand = cc: cxx: ''
+    export named_cc=${cc};
+    export named_cxx=${cxx};
+
+    ln -s $ccPath/${cc} $out/bin/cc
+    ln -s $ccPath/${cxx} $out/bin/c++
+  '';
+
   afl = llvmPkgs.stdenv.mkDerivation rec {
     name = "afl";
 
@@ -22,35 +44,16 @@ let
       make -C llvm_mode -j $NIX_BUILD_CORES
     '';
 
-    # Copy pasted from
-    # https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/afl/default.nix
-    postInstall = ''
-      rm $out/bin/afl-clang-fast++
-      cp $out/bin/afl-clang-fast $out/bin/afl-clang-fast++
-      for x in $out/bin/afl-clang-fast $out/bin/afl-clang-fast++; do
-        wrapProgram $x \
-          --argv0 "$x" \
-          --prefix AFL_PATH : "$out/lib/afl" \
-          --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
-      done
-
+    postInstall = aflPostInstall clang "afl-clang-fast" "afl-clang-fast++" + ''
       c++ -c -std=c++11 -o $out/lib/afl/afl_driver.o ${./src/afl_driver.cpp}
-    '';
-  };
-  afl-cc = pkgs.wrapCCWith {
-    cc = afl;
-    extraBuildCommands = ''
-      # Don't wrap afl-clang-fast, since it already references a wrapped clang
-      export named_cc=afl-clang-fast
-      export named_cxx=afl-clang-fast++
-
-      # Create symlinks
-      ln -s $ccPath/afl-clang-fast $out/bin/cc
-      ln -s $ccPath/afl-clang-fast++ $out/bin/c++
     '';
   };
 in
 afl // {
+  inherit aflPostInstall wrapCCExtraBuildCommand;
   driver = "${afl}/lib/afl/afl_driver.o";
-  stdenv = pkgs.overrideCC llvmPkgs.stdenv afl-cc;
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv (pkgs.wrapCCWith {
+    cc = afl;
+    extraBuildCommands = wrapCCExtraBuildCommand "afl-clang-fast" "afl-clang-fast++";
+  });
 }

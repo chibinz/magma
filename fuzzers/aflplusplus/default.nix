@@ -1,6 +1,8 @@
 { pkgs ? import <nixpkgs> { } }:
 
 let
+  afl = import ../afl { inherit pkgs; };
+
   llvmPkgs = pkgs.llvmPackages_14;
   clang = llvmPkgs.clang;
   aflplusplus = llvmPkgs.stdenv.mkDerivation {
@@ -19,32 +21,19 @@ let
     makeFlags = [ "AFL_NO_X86=1" "PREFIX=$(out)" ];
 
     preInstall = ''
-      sed -i 's/-$(LLVM_BINDIR)//g' utils/aflpp_driver/GNUmakefile
+      substituteInPlace utils/aflpp_driver/GNUmakefile \
+        --replace '-$(LLVM_BINDIR)' ""
     '';
 
-    postInstall = ''
-      rm $out/bin/afl-c++
-      cp $out/bin/afl-cc $out/bin/afl-c++
-      for x in $out/bin/afl-cc $out/bin/afl-c++; do
-        wrapProgram $x \
-          --argv0 "$x" \
-          --prefix AFL_PATH : "$out/lib/afl" \
-          --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
-      done
-    '';
-  };
-  afl-cc = pkgs.wrapCCWith {
-    cc = aflplusplus;
-    extraBuildCommands = ''
-      export named_cc=afl-cc
-      export named_cxx=afl-c++
-
-      ln -s $ccPath/afl-cc $out/bin/cc
-      ln -s $ccPath/afl-c++ $out/bin/c++
-    '';
+    postInstall = afl.aflPostInstall clang "afl-cc" "afl-c++";
   };
 in
 aflplusplus // {
   driver = "${aflplusplus}/lib/afl/libAFLDriver.a";
-  stdenv = pkgs.overrideCC llvmPkgs.stdenv afl-cc;
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv (pkgs.wrapCCWith rec {
+    cc = aflplusplus;
+    libcxx = llvmPkgs.libcxx;
+    bintools = llvmPkgs.bintools;
+    extraBuildCommands = afl.wrapCCExtraBuildCommand "afl-cc" "afl-c++";
+  });
 }
