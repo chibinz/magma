@@ -20,11 +20,10 @@
           llvm_lto = fuzzers.llvm_lto { inherit pkgs; };
 
           fuzzer = aflplusplus;
-          libpng = targets.libpng {
-            inherit (pkgs) fetchFromGitHub;
-            zlib = pkgs.zlib.override { stdenv = fuzzer.stdenv; shared = false; static = true; };
-            driver = aflplusplus.driver;
-            stdenv = aflplusplus.stdenv;
+
+          libpng = targets.lua {
+            inherit (pkgs) fetchFromGitHub readline;
+            inherit (fuzzer) stdenv driver;
           };
           default = libpng;
         };
