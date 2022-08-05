@@ -33,10 +33,11 @@ stdenv.mkDerivation rec {
 
   programs = [ "sqlite3_fuzz" ];
 
-  postInstall = ''
-    make sqlite3.c
+  buildFlags = [ "sqlite3.o" ];
 
-    cc -pthread -I $out/include -o $out/bin/${builtins.head programs} \
-      test/ossfuzz.c sqlite3.o ${driver} -ldl -lm
+  postInstall = ''
+    cc -c -I $out/include -o ossfuzz.o test/ossfuzz.c
+    c++ -pthread -o $out/bin/${builtins.head programs} \
+      ossfuzz.o $out/lib/libsqlite3.a ${driver} -ldl -lm
   '';
 }
