@@ -4,8 +4,6 @@
 }:
 
 let
-  afl = import ../afl { inherit pkgs; };
-
   llvmPkgs = pkgs.llvmPackages_14;
   clang = llvmPkgs.clang;
   aflplusplus = llvmPkgs.stdenv.mkDerivation {
@@ -28,7 +26,7 @@ let
         --replace '-$(LLVM_BINDIR)' ""
     '';
 
-    postInstall = afl.aflPostInstall clang "afl-cc" "afl-c++";
+    postInstall = aflPostInstall clang "afl-cc" "afl-c++";
   };
 in
 aflplusplus // {

@@ -20,6 +20,9 @@ stdenv.mkDerivation rec {
     cp ${./src/abilist.txt} abilist.txt;
   '';
 
+  LDCMD = "c++";
+  LDLIBS = driver;
+
   configFlags = [
     "--prefix=$out"
     "--debug"
@@ -40,9 +43,7 @@ stdenv.mkDerivation rec {
     "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
     "-fno-sanitize=alignment"
 
-    # OpenSSL requires driver to be postfixed with `.a`.
     "enable-fuzz-libfuzzer"
-    "--with-fuzzer-lib=${driver}"
   ];
 
   configurePhase = ''

@@ -18,11 +18,11 @@
           "openssl"
           "sqlite3"
         ];
-        dummyDriver = pkgs.runCommandCC "dummy-driver" { } ''
+        dummyDriver = (pkgs.runCommandCC "dummy-driver" { } ''
           mkdir -p $out/lib
           cc -c -o driver.o ${./driver.c}
           ar -r $out/lib/libdriver.a driver.o
-        '';
+        '') // { driver = "${dummyDriver}/lib/libdriver.a"; };
         aflPostInstall = clang: cc: cxx: ''
           # Copy pasted from
           # https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/afl/default.nix

@@ -31,5 +31,5 @@ let
 in
 {
   stdenv = pkgs.overrideCC llvmPkgs.stdenv clang-lto;
-  driver = "${dummyDriver}/lib/libdriver.a";
+  driver = dummyDriver.driver;
 }
