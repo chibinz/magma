@@ -7,25 +7,38 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
-        llvmPkgs = pkgs.llvmPackages_14;
-        stdenv = llvmPkgs.stdenv;
-        fuzzers = import ./fuzzers;
-        targets = import ./targets;
-        deps = import ./deps.nix;
+        fuzzers = [
+          "afl"
+          "aflplusplus"
+          "llvm_lto"
+        ];
+        targets = [
+          "libpng"
+          "sqlite3"
+        ];
+        buildSingle = { f, t }:
+          let
+            fuzzer = pkgs.callPackage  ./fuzzers/${f} { };
+            target = pkgs.callPackage ./targets/${t} {
+              inherit (fuzzer) stdenv driver;
+            };
+          in
+          {
+            name = "${f}-${t}";
+            path = target;
+          };
+        buildBench = name: fs: ts:
+          let
+            buildSet = pkgs.lib.attrsets.cartesianProductOfSets { f = fs; t = ts; };
+            BuildList = map buildSingle buildSet;
+          in
+          pkgs.linkFarm name BuildList;
+        buildSingleTarget = f: t: (buildSingle { inherit f t; }).path;
+        buildAll = buildBench "magma" fuzzers targets;
       in
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          afl = fuzzers.afl { inherit pkgs; };
-          aflplusplus = fuzzers.aflplusplus { inherit pkgs; };
-          llvm_lto = fuzzers.llvm_lto { inherit pkgs; };
-
-          fuzzer = aflplusplus;
-
-          libpng = targets.openssl {
-            inherit (pkgs) fetchFromGitHub perl;
-            inherit (fuzzer) stdenv driver;
-          };
-          default = libpng;
+          default = buildAll;
         };
       }
     );
