@@ -46,12 +46,13 @@ let
 
     postInstall = aflPostInstall clang "afl-clang-fast" "afl-clang-fast++" + ''
       c++ -c -std=c++11 -o $out/lib/afl/afl_driver.o ${./src/afl_driver.cpp}
+      ar -r $out/lib/afl/libafl_driver.a $out/lib/afl/afl_driver.o
     '';
   };
 in
 afl // {
   inherit aflPostInstall wrapCCExtraBuildCommand;
-  driver = "${afl}/lib/afl/afl_driver.o";
+  driver = "${afl}/lib/afl/libafl_driver.a";
   stdenv = pkgs.overrideCC llvmPkgs.stdenv (pkgs.wrapCCWith {
     cc = afl;
     extraBuildCommands = wrapCCExtraBuildCommand "afl-clang-fast" "afl-clang-fast++";

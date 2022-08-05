@@ -40,6 +40,7 @@ stdenv.mkDerivation rec {
     "-DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION"
     "-fno-sanitize=alignment"
 
+    # OpenSSL requires driver to be postfixed with `.a`.
     "enable-fuzz-libfuzzer"
     "--with-fuzzer-lib=${driver}"
   ];

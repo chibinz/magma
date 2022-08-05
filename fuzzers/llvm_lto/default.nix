@@ -33,10 +33,9 @@ let
     src = ./.;
 
     buildPhase = ''
-      mkdir -p $out
-      echo -e "#include <stdio.h> \n int main() { return 0; }" > $out/test.c
-      cc -c -o $out/driver.o $src/driver.c
-      cc -o $out/test $out/test.c
+      mkdir -p $out/lib
+      cc -c -o $out/lib/driver.o $src/driver.c
+      ar -r $out/lib/libdriver.a $out/lib/driver.o
     '';
 
     dontInstall = true;
@@ -44,5 +43,5 @@ let
 in
 {
   inherit stdenv;
-  driver = "${dummy}/driver.o";
+  driver = "${dummy}/lib/driver.o";
 }
