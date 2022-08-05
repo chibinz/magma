@@ -18,10 +18,38 @@
           "openssl"
           "sqlite3"
         ];
+        dummyDriver = pkgs.runCommandCC "dummy-driver" { } ''
+          mkdir -p $out/lib
+          cc -c -o driver.o ${./driver.c}
+          ar -r $out/lib/libdriver.a driver.o
+        '';
+        aflPostInstall = clang: cc: cxx: ''
+          # Copy pasted from
+          # https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/afl/default.nix
+          rm $out/bin/${cxx}
+          cp $out/bin/${cc} $out/bin/${cxx}
+          for c in $out/bin/${cc} $out/bin/${cxx}; do
+            wrapProgram $c \
+              --argv0 $c \
+              --prefix AFL_PATH : $out/lib/afl \
+              --run 'export AFL_CC=''${AFL_CC:-${clang}/bin/clang} AFL_CXX=''${AFL_CXX:-${clang}/bin/clang++}'
+          done
+        '';
+        wrapCCExtraBuildCommand = cc: cxx: ''
+          export named_cc=${cc};
+          export named_cxx=${cxx};
+
+          ln -s $ccPath/${cc} $out/bin/cc
+          ln -s $ccPath/${cxx} $out/bin/c++
+        '';
+        callPackage = pkgs.lib.callPackageWith ({
+          inherit (pkgs) pkgs perl readline tcl zlib fetchFromGitHub;
+          inherit aflPostInstall dummyDriver wrapCCExtraBuildCommand;
+        });
         buildSingleHelper = { f, t }:
           let
-            fuzzer = pkgs.callPackage  ./fuzzers/${f} { };
-            target = pkgs.callPackage ./targets/${t} {
+            fuzzer = callPackage  ./fuzzers/${f} { };
+            target = callPackage ./targets/${t} {
               inherit (fuzzer) stdenv driver;
             };
           in

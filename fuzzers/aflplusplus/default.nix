@@ -1,4 +1,7 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs
+, aflPostInstall
+, wrapCCExtraBuildCommand
+}:
 
 let
   afl = import ../afl { inherit pkgs; };
@@ -34,6 +37,6 @@ aflplusplus // {
     cc = aflplusplus;
     libcxx = llvmPkgs.libcxx;
     bintools = llvmPkgs.bintools;
-    extraBuildCommands = afl.wrapCCExtraBuildCommand "afl-cc" "afl-c++";
+    extraBuildCommands = wrapCCExtraBuildCommand "afl-cc" "afl-c++";
   });
 }
