@@ -14,9 +14,11 @@
         ];
         targets = [
           "libpng"
+          "lua"
+          "openssl"
           "sqlite3"
         ];
-        buildSingle = { f, t }:
+        buildSingleHelper = { f, t }:
           let
             fuzzer = pkgs.callPackage  ./fuzzers/${f} { };
             target = pkgs.callPackage ./targets/${t} {
@@ -27,14 +29,14 @@
             name = "${f}-${t}";
             path = target;
           };
-        buildBench = name: fs: ts:
+        buildSingle = f: t: (buildSingleHelper { inherit f t; }).path;
+        buildMultiple = name: fs: ts:
           let
             buildSet = pkgs.lib.attrsets.cartesianProductOfSets { f = fs; t = ts; };
-            BuildList = map buildSingle buildSet;
+            BuildList = map buildSingleHelper buildSet;
           in
           pkgs.linkFarm name BuildList;
-        buildSingleTarget = f: t: (buildSingle { inherit f t; }).path;
-        buildAll = buildBench "magma" fuzzers targets;
+        buildAll = buildMultiple "magma" fuzzers targets;
       in
       rec {
         packages = flake-utils.lib.flattenTree rec {
