@@ -23,11 +23,10 @@ stdenv.mkDerivation {
 
   postInstall = ''
     # Add missing header for `malloc/free`
-    echo "#include <stdlib.h>" > $out/libpng_read_fuzzer.cc
-    cat $src/contrib/oss-fuzz/libpng_read_fuzzer.cc >> $out/libpng_read_fuzzer.cc
+    sed -i '1i #include <stdlib.h>' contrib/oss-fuzz/libpng_read_fuzzer.cc
 
     # Link order matters here
     c++ -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer \
-      $out/libpng_read_fuzzer.cc $out/lib/libpng16.a ${driver} -lz
+      contrib/oss-fuzz/libpng_read_fuzzer.cc $out/lib/libpng16.a ${driver} -lz
   '';
 }
