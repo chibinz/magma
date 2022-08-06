@@ -20,6 +20,8 @@ let
     # AFL implicitly relies on which to check for `llvm-config` availability.
     buildInputs = [ llvmPkgs.llvm pkgs.which pkgs.makeWrapper ];
 
+    enableParallelBuilding = true;
+
     makeFlags = [ "AFL_NO_X86=1" "PREFIX=$(out)" ];
 
     postBuild = ''

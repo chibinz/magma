@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ tcl ];
 
+  enableParallelBuilding = true;
+
   configureFlags = [
     "--disable-shared"
     "--disable-tcl"

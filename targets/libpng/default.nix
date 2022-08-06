@@ -16,7 +16,8 @@ stdenv.mkDerivation {
 
   buildInputs = [ zlib ];
 
-  dontDisableStatic = true;
+  enableParallelBuilding = true;
+
   configureFlags = [
     "--disable-shared"
   ];

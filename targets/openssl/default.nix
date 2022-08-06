@@ -16,6 +16,8 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ perl ];
 
+  enableParallelBuilding = true;
+
   postPatch = ''
     cp ${./src/abilist.txt} abilist.txt;
   '';

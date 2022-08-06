@@ -14,9 +14,11 @@ stdenv.mkDerivation {
     hash = "sha256-OPCTULiACQAU6XrzH0knXYsqRAz3ZHr5w79hSZ0wxfg=";
   };
 
-  patches = [ ./patches/setup/lua.patch ];
-
   buildInputs = [ readline ];
+
+  enableParallelBuilding = true;
+
+  patches = [ ./patches/setup/lua.patch ];
 
   installPhase = ''
     mkdir -p $out/bin $out/lib

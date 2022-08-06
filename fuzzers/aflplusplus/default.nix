@@ -19,6 +19,8 @@ let
 
     buildInputs = [ llvmPkgs.llvm llvmPkgs.lld pkgs.makeWrapper ];
 
+    enableParallelBuilding = true;
+
     makeFlags = [ "AFL_NO_X86=1" "PREFIX=$(out)" ];
 
     preInstall = ''
