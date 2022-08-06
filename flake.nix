@@ -42,8 +42,7 @@
           ln -s $ccPath/${cc} $out/bin/cc
           ln -s $ccPath/${cxx} $out/bin/c++
         '';
-        callPackage = pkgs.lib.callPackageWith ({
-          inherit (pkgs) pkgs perl readline tcl zlib fetchFromGitHub;
+        callPackage = pkgs.lib.callPackageWith (pkgs // {
           inherit aflPostInstall dummyDriver wrapCCExtraBuildCommand;
         });
         buildSingleHelper = { f, t }:

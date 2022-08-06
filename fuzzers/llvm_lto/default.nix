@@ -17,7 +17,7 @@ let
 
   clang-lto = pkgs.wrapCCWith rec {
     cc = llvmPkgs.clang-unwrapped;
-    libcxx = llvmPkgs.libcxx;
+    # libcxx = llvmPkgs.libcxx; # php doesn't like libcxx
     bintools = llvmPkgs.bintools;
     extraPackages = [
       llvmPkgs.libcxxabi
