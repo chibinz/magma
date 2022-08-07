@@ -9,8 +9,6 @@
 , re2c
 }:
 
-with import <nixpkgs> { };
-
 let
   oniguruma = stdenv.mkDerivation rec {
     pname = "onig";
@@ -32,8 +30,7 @@ let
 
 in
 
-stdenv.mkDerivation
-{
+stdenv.mkDerivation rec {
   name = "php";
 
   src = fetchFromGitHub {
@@ -84,4 +81,17 @@ stdenv.mkDerivation
     "unserialize"
     "parser"
   ];
+
+  postInstall = ''
+  # Generate seed corpora
+  sapi/cli/php sapi/fuzzer/generate_unserialize_dict.php
+  sapi/cli/php sapi/fuzzer/generate_parser_corpus.php
+
+  mkdir -p $out/corpus
+
+  for f in ${builtins.concatStringsSep " " programs}; do
+    cp sapi/fuzzer/php-fuzz-$f $out/bin/$f
+    cp -r sapi/fuzzer/corpus/$f $out/corpus
+  done
+  '';
 }
