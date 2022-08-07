@@ -14,8 +14,10 @@
         ];
         targets = [
           "libpng"
+          "libxml2"
           "lua"
           "openssl"
+          "php"
           "sqlite3"
         ];
         dummyDriver = (pkgs.runCommandCC "dummy-driver" { } ''

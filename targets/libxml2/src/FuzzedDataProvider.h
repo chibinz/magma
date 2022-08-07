@@ -24,6 +24,9 @@
 #include <utility>
 #include <vector>
 
+// Required for std::numeric_limits<T>::max().
+#include <limits>
+
 // In addition to the comments below, the API is also briefly documented at
 // https://github.com/google/fuzzing/blob/master/docs/split-inputs.md#fuzzed-data-provider
 class FuzzedDataProvider {
