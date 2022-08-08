@@ -14,6 +14,7 @@
         ];
         targets = [
           "libpng"
+          "libtiff"
           "libxml2"
           "lua"
           "openssl"
