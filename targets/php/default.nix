@@ -1,15 +1,17 @@
 { stdenv
 , driver
+, fetchFromGitHub
 , autoconf
 , autoreconfHook
 , bison
-, fetchFromGitHub
 , icu
+, oniguruma
 , pkg-config
 , re2c
 }:
 
 let
+/*
   oniguruma = stdenv.mkDerivation rec {
     pname = "onig";
     version = "6.9.7.1";
@@ -27,7 +29,7 @@ let
 
     configureFlags = [ "--disable-shared" ];
   };
-
+*/
 in
 
 stdenv.mkDerivation rec {
