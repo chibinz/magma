@@ -14,6 +14,7 @@
         ];
         targets = [
           "libpng"
+          "libsndfile"
           "libtiff"
           "libxml2"
           "lua"

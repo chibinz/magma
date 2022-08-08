@@ -39,6 +39,6 @@ stdenv.mkDerivation {
 
   passthru = {
     programs = [ "tiff_read_rgba_fuzzer" "tiffcp" ];
-    programArgs.tiffcp = "-M @@ tmp.out";
+    args.tiffcp = "-M @@ tmp.out";
   };
 }
