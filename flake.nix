@@ -20,6 +20,7 @@
           "lua"
           "openssl"
           "php"
+          "poppler"
           "sqlite3"
         ];
         dummyDriver = (pkgs.runCommandCC "dummy-driver" { } ''
