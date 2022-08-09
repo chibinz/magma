@@ -7,6 +7,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
+        magma = pkgs.callPackage ./magma { };
         fuzzers = [
           "afl"
           "aflplusplus"
@@ -48,7 +49,7 @@
           ln -s $ccPath/${cxx} $out/bin/c++
         '';
         callPackage = pkgs.lib.callPackageWith (pkgs // {
-          inherit aflPostInstall dummyDriver wrapCCExtraBuildCommand;
+          inherit magma aflPostInstall dummyDriver wrapCCExtraBuildCommand;
         });
         buildSingleHelper = { f, t }:
           let
@@ -72,7 +73,7 @@
       in
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          default = buildAll;
+          default = buildSingle "llvm_lto" "libpng";
         };
       }
     );
