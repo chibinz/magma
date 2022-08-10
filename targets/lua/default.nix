@@ -1,6 +1,7 @@
-{ fetchFromGitHub
+{ magma
 , stdenv
 , driver
+, fetchFromGitHub
 , readline
 }:
 
@@ -18,7 +19,7 @@ stdenv.mkDerivation {
 
   enableParallelBuilding = true;
 
-  patches = [ ./patches/setup/lua.patch ];
+  prePatch = magma.prePatch ./patches;
 
   installPhase = ''
     mkdir -p $out/bin $out/lib

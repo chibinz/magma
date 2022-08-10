@@ -1,4 +1,5 @@
-{ stdenv
+{ magma
+, stdenv
 , driver
 , fetchFromGitLab
 , autoconf
@@ -22,6 +23,8 @@ stdenv.mkDerivation {
   buildInputs = [ autoconf automake libtool libjpeg lzma zlib ];
 
   enableParallelBuilding = true;
+
+  prePatch = magma.prePatch ./patches;
 
   preConfigure = ''
     # Prevents `autogen.sh` from fetching configs from the internet.

@@ -1,6 +1,7 @@
-{ fetchFromGitHub
+{ magma
 , stdenv
 , driver
+, fetchFromGitHub
 , tcl
 }:
 
@@ -17,6 +18,9 @@ stdenv.mkDerivation rec {
   buildInputs = [ tcl ];
 
   enableParallelBuilding = true;
+
+  prePatch = magma.prePatch ./patches;
+
 
   configureFlags = [
     "--disable-shared"

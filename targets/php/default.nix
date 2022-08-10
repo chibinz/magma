@@ -1,4 +1,5 @@
-{ stdenv
+{ magma
+, stdenv
 , driver
 , fetchFromGitHub
 , autoconf
@@ -46,7 +47,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  patches = [ ./patches/setup/setup.patch ];
+  prePatch = magma.prePatch ./patches;
 
   # PHP's zend_function union is incompatible with the object-size sanitizer
   EXTRA_CFLAGS = "-fno-sanitize=object-size";

@@ -1,4 +1,5 @@
-{ stdenv
+{ magma
+, stdenv
 , driver
 , fetchFromGitHub
 , autoconf
@@ -22,6 +23,8 @@ stdenv.mkDerivation rec {
   buildInputs = [ autoconf automake libtool lzma pkg-config zlib ];
 
   enableParallelBuilding = true;
+
+  prePatch = magma.prePatch ./patches;
 
   configureFlags = [
     "--prefix=$out"

@@ -1,4 +1,5 @@
-{ stdenv
+{ magma
+, stdenv
 , driver
 , fetchFromGitHub
 , autoconf
@@ -26,8 +27,6 @@ stdenv.mkDerivation {
     hash = "sha256-qt4M9zLqUKqs/V1FplsQU0DVPAYfncity06HN0394EY=";
   };
 
-  patches = [ ./patches/setup/libsndfile.patch ];
-
   buildInputs = [
     autoconf
     autogen
@@ -45,6 +44,8 @@ stdenv.mkDerivation {
   ];
 
   enableParallelBuilding = true;
+
+  prePatch = magma.prePatch ./patches;
 
   preConfigure = ''
     ./autogen.sh

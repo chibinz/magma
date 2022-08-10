@@ -1,6 +1,7 @@
-{ fetchFromGitHub
+{ magma
 , stdenv
 , driver
+, fetchFromGitHub
 , perl
 }:
 
@@ -18,7 +19,7 @@ stdenv.mkDerivation rec {
 
   enableParallelBuilding = true;
 
-  postPatch = ''
+  prePatch = magma.prePatch ./patches + ''
     cp ${./src/abilist.txt} abilist.txt;
   '';
 

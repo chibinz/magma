@@ -1,4 +1,5 @@
-{ stdenv
+{ magma
+, stdenv
 , driver
 , fetchFromGitHub
 , cairo
@@ -37,6 +38,8 @@ stdenv.mkDerivation {
   ];
 
   enableParallelBuilding = true;
+
+  prePatch = magma.prePatch ./patches;
 
   cmakeFlags = [
     # "-DCMAKE_BUILD_TYPE=debug"
