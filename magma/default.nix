@@ -57,4 +57,11 @@ magma // {
     "${magma}/lib/libmagma.a"
     "-lrt"
   ];
+  prePatch = dir: ''
+    for p in $(find ${dir}/setup ${dir}/bugs -name '*.patch'); do
+        name=$(basename $p .patch)
+        sed "s/%MAGMA_BUG%/$name/g" $p > /tmp/$name.patch
+        patches="$patches /tmp/$name.patch"
+     done
+  '';
 }

@@ -1,6 +1,7 @@
-{ fetchFromGitHub
+{ magma
 , stdenv
 , driver
+, fetchFromGitHub
 , zlib
 }:
 
@@ -18,6 +19,8 @@ stdenv.mkDerivation {
 
   enableParallelBuilding = true;
 
+  prePatch = magma.prePatch ./patches;
+
   configureFlags = [
     "--disable-shared"
   ];
@@ -28,6 +31,6 @@ stdenv.mkDerivation {
 
     # Link order matters here
     c++ -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer \
-      contrib/oss-fuzz/libpng_read_fuzzer.cc $out/lib/libpng16.a ${driver} -lz
+      contrib/oss-fuzz/libpng_read_fuzzer.cc $out/lib/libpng16.a -lz
   '';
 }

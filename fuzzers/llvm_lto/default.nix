@@ -1,4 +1,5 @@
-{ pkgs
+{ magma
+, pkgs
 , dummyDriver
 }:
 
@@ -25,7 +26,8 @@ let
     ];
     extraBuildCommands = mkExtraBuildCommands cc;
     nixSupport = {
-      cc-cflags = [ "-flto" ];
+      cc-cflags = magma.cflags ++ [ "-flto" ];
+      cc-ldflags = magma.ldflags ++ [ dummyDriver.driver ];
     };
   };
 in

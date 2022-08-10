@@ -7,7 +7,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
-        magma = pkgs.callPackage ./magma { };
+        magma = pkgs.callPackage ./magma { canaries = true; };
         fuzzers = [
           "afl"
           "aflplusplus"
