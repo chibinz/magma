@@ -1,5 +1,4 @@
-{ magma
-, pkgs
+{ pkgs
 , dummyDriver
 , wrapClang
 }:
@@ -14,5 +13,6 @@ let
   };
 in
 {
+  inherit (dummyDriver) driver;
   stdenv = pkgs.overrideCC llvmPkgs.stdenv clang-lto;
 }

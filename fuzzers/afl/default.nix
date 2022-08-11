@@ -1,5 +1,4 @@
-{ magma
-, pkgs
+{ pkgs
 , aflPostInstall
 , wrapClang
 }:
@@ -35,12 +34,13 @@ let
     '';
   };
 in
-afl // {
+afl // rec {
+  driver = "${afl}/lib/afl/libafl_driver.a";
   stdenv = pkgs.overrideCC llvmPkgs.stdenv (wrapClang {
     inherit llvmPkgs;
     cc = afl;
     cc_name = "afl-clang-fast";
     cxx_name = "afl-clang-fast++";
-    ldflags = [ "${afl}/lib/afl/libafl_driver.a" "-lstdc++" ];
+    ldflags = [ driver "-lstdc++" ];
   });
 }

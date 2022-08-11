@@ -1,6 +1,6 @@
 { pkgs
 , aflPostInstall
-, wrapCCExtraBuildCommand
+, wrapClang
 }:
 
 let
@@ -31,12 +31,13 @@ let
     postInstall = aflPostInstall clang "afl-cc" "afl-c++";
   };
 in
-aflplusplus // {
+aflplusplus // rec {
   driver = "${aflplusplus}/lib/afl/libAFLDriver.a";
-  stdenv = pkgs.overrideCC llvmPkgs.stdenv (pkgs.wrapCCWith rec {
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv (wrapClang {
+    inherit llvmPkgs;
     cc = aflplusplus;
-    libcxx = llvmPkgs.libcxx;
-    bintools = llvmPkgs.bintools;
-    extraBuildCommands = wrapCCExtraBuildCommand "afl-cc" "afl-c++";
+    cc_name = "afl-cc";
+    cxx_name = "afl-c++";
+    ldflags = [ driver "-lstdc++" ];
   });
 }

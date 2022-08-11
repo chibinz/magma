@@ -10,7 +10,7 @@
         magma = pkgs.callPackage ./magma { canaries = true; };
         fuzzers = [
           "afl"
-          # "aflplusplus"
+          "aflplusplus"
           "llvm_lto"
         ];
         targets = [
@@ -113,7 +113,7 @@
       in
       rec {
         packages = flake-utils.lib.flattenTree rec {
-          default = buildSingle "llvm_lto" "libpng";
+          default = buildAll;
         };
       }
     );
