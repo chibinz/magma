@@ -11,16 +11,16 @@
         fuzzers = [
           "afl"
           # "aflplusplus"
-          # "llvm_lto"
+          "llvm_lto"
         ];
         targets = [
-          # "libpng"
-          # "libsndfile"
+          "libpng"
+          "libsndfile"
           "libtiff"
           "libxml2"
           "lua"
           "openssl"
-          # "php"
+          "php"
           "poppler"
           "sqlite3"
         ];

@@ -51,6 +51,7 @@ stdenv.mkDerivation rec {
   # PHP's zend_function union is incompatible with the object-size sanitizer
   EXTRA_CFLAGS = "-fno-sanitize=object-size";
   EXTRA_CXXFLAGS = "-fno-sanitize=object-size";
+  LIB_FUZZING_ENGINE = "-Wall";
 
   preConfigure = ''
     ./buildconf
@@ -61,6 +62,7 @@ stdenv.mkDerivation rec {
     "--disable-all"
     "--disable-cgi"
     "--disable-phpdbg"
+    "--disable-fiber-asm"
     "--enable-option-checking=fatal"
     "--enable-fuzzer"
     "--enable-exif"
