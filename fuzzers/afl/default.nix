@@ -1,7 +1,7 @@
 { magma
 , pkgs
 , aflPostInstall
-, wrapCCExtraBuildCommand
+, wrapClang
 }:
 
 let
@@ -34,31 +34,13 @@ let
       ar -r $out/lib/afl/libafl_driver.a $out/lib/afl/afl_driver.o
     '';
   };
-  release_version = "9.0.1";
 in
 afl // {
-  stdenv = pkgs.overrideCC llvmPkgs.stdenv (pkgs.wrapCCWith rec {
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv (wrapClang {
+    inherit llvmPkgs;
     cc = afl;
-    isClang = true;
-    extraBuildCommands = ''
-      export named_cc=afl-clang-fast
-      export named_cxx=afl-clang-fast++
-
-      wrap $named_cc $wrapper $ccPath/$named_cc
-      wrap $named_cxx $wrapper $ccPath/$named_cxx
-
-      rsrc="$out/resource-root"
-      mkdir "$rsrc"
-      ln -s "${llvmPkgs.clang-unwrapped.lib}/lib/clang/${release_version}/include" "$rsrc"
-      echo "-resource-dir=$rsrc" >> $out/nix-support/cc-cflags
-
-      ln -s $out/bin/afl-clang-fast $out/bin/cc
-      ln -s $out/bin/afl-clang-fast++ $out/bin/c++
-    '';
-    # wrapCCExtraBuildCommand "afl-clang-fast" "afl-clang-fast++";
-    nixSupport = {
-      cc-cflags = magma.cflags;
-      cc-ldflags = magma.ldflags ++ [ "${afl}/lib/afl/libafl_driver.a" "-lstdc++" ];
-    };
+    cc_name = "afl-clang-fast";
+    cxx_name = "afl-clang-fast++";
+    ldflags = [ "${afl}/lib/afl/libafl_driver.a" "-lstdc++" ];
   });
 }
