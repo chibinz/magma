@@ -1,18 +1,15 @@
 { magma
 , stdenv
-, driver
-, fetchFromGitHub
+, fetchzip
 , tcl
 }:
 
 stdenv.mkDerivation rec {
   name = "sqlite";
 
-  src = fetchFromGitHub {
-    owner = "sqlite";
-    repo = "sqlite";
-    rev = "version-3.37.0";
-    hash = "sha256-w4K/gbFfFSKMF78NJOMa12/WGIv6ymSNYU8KztG1bow=";
+  src = fetchzip {
+    url = "https://www.sqlite.org/src/tarball/sqlite.tar.gz?r=8c432642572c8c4b";
+    hash = "sha256-M2jTP7pPAl8FCBYj+fMCptR8yuC6nixvScN5Ahs5oxQ=";
   };
 
   buildInputs = [ tcl ];
@@ -20,7 +17,6 @@ stdenv.mkDerivation rec {
   enableParallelBuilding = true;
 
   prePatch = magma.prePatch ./patches;
-
 
   configureFlags = [
     "--disable-shared"
@@ -44,6 +40,6 @@ stdenv.mkDerivation rec {
   postInstall = ''
     cc -c -I $out/include -o ossfuzz.o test/ossfuzz.c
     c++ -pthread -o $out/bin/${builtins.head programs} \
-      ossfuzz.o $out/lib/libsqlite3.a ${driver} -ldl -lm
+      ossfuzz.o $out/lib/libsqlite3.a -ldl -lm
   '';
 }

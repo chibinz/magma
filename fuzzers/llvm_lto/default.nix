@@ -27,7 +27,7 @@ let
     extraBuildCommands = mkExtraBuildCommands cc;
     nixSupport = {
       cc-cflags = magma.cflags ++ [ "-flto" ];
-      cc-ldflags = magma.ldflags ++ [ dummyDriver.driver ];
+      cc-ldflags = magma.ldflags ++ [ dummyDriver.driver "-lstdc++" ];
     };
   };
 in

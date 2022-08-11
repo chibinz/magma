@@ -1,6 +1,5 @@
 { magma
 , stdenv
-, driver
 , fetchFromGitHub
 , perl
 }:
@@ -22,9 +21,6 @@ stdenv.mkDerivation rec {
   prePatch = magma.prePatch ./patches + ''
     cp ${./src/abilist.txt} abilist.txt;
   '';
-
-  LDCMD = "c++";
-  LDLIBS = driver;
 
   configFlags = [
     "--prefix=$out"

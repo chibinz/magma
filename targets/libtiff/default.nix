@@ -1,6 +1,5 @@
 { magma
 , stdenv
-, driver
 , fetchFromGitLab
 , autoconf
 , automake
@@ -37,7 +36,7 @@ stdenv.mkDerivation {
   postInstall = ''
     c++ -std=c++11 -I $out/include -o $out/bin/tiff_read_rgba_fuzzer \
         contrib/oss-fuzz/tiff_read_rgba_fuzzer.cc $out/lib/libtiffxx.a \
-        $out/lib/libtiff.a ${driver} -lz -ljpeg -llzma
+        $out/lib/libtiff.a -lz -ljpeg -llzma
   '';
 
   passthru = {

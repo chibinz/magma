@@ -9,18 +9,18 @@
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
         magma = pkgs.callPackage ./magma { canaries = true; };
         fuzzers = [
-          # "afl"
+          "afl"
           # "aflplusplus"
-          "llvm_lto"
+          # "llvm_lto"
         ];
         targets = [
-          "libpng"
-          "libsndfile"
+          # "libpng"
+          # "libsndfile"
           "libtiff"
           "libxml2"
           "lua"
           "openssl"
-          "php"
+          # "php"
           "poppler"
           "sqlite3"
         ];
@@ -55,7 +55,7 @@
           let
             fuzzer = callPackage  ./fuzzers/${f} { };
             target = callPackage ./targets/${t} {
-              inherit (fuzzer) stdenv driver;
+              inherit (fuzzer) stdenv;
             };
           in
           {

@@ -1,6 +1,5 @@
 { magma
 , stdenv
-, driver
 , fetchFromGitHub
 , cairo
 , cmake
@@ -70,7 +69,7 @@ stdenv.mkDerivation {
   postInstall = ''
     c++ -std=c++11 -I $out/include/poppler/cpp -o $out/bin/pdf_fuzzer \
     ${./src/pdf_fuzzer.cc} $out/lib/libpoppler-cpp.a $out/lib/libpoppler.a \
-    ${driver} -lfreetype -ljpeg -lz -lopenjp2 -lpng -ltiff -lm
+    -lfreetype -ljpeg -lz -lopenjp2 -lpng -ltiff -lm
   '';
 
   passthru = {

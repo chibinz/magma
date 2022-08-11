@@ -1,6 +1,5 @@
 { magma
 , stdenv
-, driver
 , fetchFromGitHub
 , autoconf
 , autoreconfHook
@@ -52,7 +51,6 @@ stdenv.mkDerivation rec {
   # PHP's zend_function union is incompatible with the object-size sanitizer
   EXTRA_CFLAGS = "-fno-sanitize=object-size";
   EXTRA_CXXFLAGS = "-fno-sanitize=object-size";
-  LIB_FUZZING_ENGINE = driver;
 
   preConfigure = ''
     ./buildconf

@@ -1,6 +1,5 @@
 { magma
 , stdenv
-, driver
 , fetchFromGitHub
 , autoconf
 , autogen
