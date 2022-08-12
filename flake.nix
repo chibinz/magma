@@ -11,7 +11,7 @@
         fuzzers = [
           "afl"
           "aflplusplus"
-          "llvm_lto"
+          # "llvm_lto"
         ];
         targets = [
           "libpng"
@@ -91,16 +91,42 @@
         callPackage = pkgs.lib.callPackageWith (pkgs // {
           inherit magma dummyDriver wrapClang aflPostInstall;
         });
-        buildSingleHelper = { f, t }:
+        buildSingleHelper = { f, t, buildImage ? true }:
           let
-            fuzzer = callPackage  ./fuzzers/${f} { };
+            fuzzer = callPackage ./fuzzers/${f} { };
             target = callPackage ./targets/${t} {
               inherit (fuzzer) stdenv;
             };
           in
-          {
+          rec {
             name = "${f}-${t}";
-            path = target;
+            path =
+              if buildImage then
+                pkgs.dockerTools.buildLayeredImage
+                  {
+                    inherit name;
+                    tag = "latest";
+                    contents = [ fuzzer target magma pkgs.bash pkgs.coreutils ];
+                    config = {
+                      Env = [
+                        "FUZZER=${f}"
+                        "TARGET=${t}"
+                        "OUT=/bin"
+                        "SHARED=/magma_shared"
+                        "POLL=5"
+                        "TIMEOUT=24h"
+                      ];
+                      Cmd = [
+                        "/bin/run.sh"
+                      ];
+                    };
+                  }
+              else
+                pkgs.symlinkJoin
+                  {
+                    inherit name;
+                    paths = [ fuzzer target ];
+                  };
           };
         buildSingle = f: t: (buildSingleHelper { inherit f t; }).path;
         buildMultiple = name: fs: ts:

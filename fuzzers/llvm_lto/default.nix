@@ -12,7 +12,6 @@ let
     ldflags = [ dummyDriver.driver "-lstdc++" ];
   };
 in
-{
-  inherit (dummyDriver) driver;
+dummyDriver // {
   stdenv = pkgs.overrideCC llvmPkgs.stdenv clang-lto;
 }
