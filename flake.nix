@@ -106,7 +106,13 @@
                   {
                     inherit name;
                     tag = "latest";
-                    contents = [ fuzzer target magma pkgs.bash pkgs.coreutils ];
+                    contents = [
+                      fuzzer.image
+                      target
+                      magma
+                      pkgs.bash
+                      pkgs.coreutils
+                    ];
                     config = {
                       Env = [
                         "FUZZER=${f}"

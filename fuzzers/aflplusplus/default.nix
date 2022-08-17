@@ -40,4 +40,12 @@ aflplusplus // rec {
     cxx_name = "afl-c++";
     ldflags = [ driver "-lstdc++" ];
   });
+  image = pkgs.runCommand "aflplusplus-image" {} ''
+    mkdir -p $out/bin
+
+    len=$(echo -n ${aflplusplus} | wc -c)
+    rep=$(printf '/%.0s' $(seq 1 $len))
+    sed "s|${aflplusplus}|$rep|g" ${aflplusplus}/bin/afl-fuzz > $out/bin/afl-fuzz
+    chmod +x $out/bin/afl-fuzz
+  '';
 }

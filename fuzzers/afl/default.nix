@@ -43,4 +43,12 @@ afl // rec {
     cxx_name = "afl-clang-fast++";
     ldflags = [ driver "-lstdc++" ];
   });
+  image = pkgs.runCommand "afl-image" {} ''
+    mkdir -p $out/bin
+
+    len=$(echo -n ${afl} | wc -c)
+    rep=$(printf '/%.0s' $(seq 1 $len))
+    sed "s|${afl}|$rep|g" ${afl}/bin/afl-fuzz > $out/bin/afl-fuzz
+    chmod +x $out/bin/afl-fuzz
+  '';
 }
