@@ -85,12 +85,12 @@ stdenv.mkDerivation rec {
     "parser"
   ];
 
-  postInstall = ''
+  installPhase = ''
+  mkdir -p $out/corpus $out/bin
+
   # Generate seed corpora
   sapi/cli/php sapi/fuzzer/generate_unserialize_dict.php
   sapi/cli/php sapi/fuzzer/generate_parser_corpus.php
-
-  mkdir -p $out/corpus
 
   for f in ${builtins.concatStringsSep " " programs}; do
     cp sapi/fuzzer/php-fuzz-$f $out/bin/$f

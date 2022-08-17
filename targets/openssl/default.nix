@@ -64,7 +64,9 @@ stdenv.mkDerivation rec {
     "x509"
   ];
 
-  postInstall = ''
+  installPhase = ''
+    mkdir -p $out/bin
+
     for p in ${builtins.concatStringsSep " " programs}; do
         cp fuzz/$p $out/bin/$p
     done;
