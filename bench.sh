@@ -42,6 +42,11 @@ bench_nix() {
         docker load -i $im
     done
 
+    # Remove build cache, only compare loaded image size
+    rm result
+    nix store gc
+
+
     checkpoint
 }
 
