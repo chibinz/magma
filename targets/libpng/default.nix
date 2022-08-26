@@ -25,11 +25,15 @@ stdenv.mkDerivation {
   ];
 
   postInstall = ''
-    # Add missing header for `malloc/free`
-    sed -i '1i #include <stdlib.h>' contrib/oss-fuzz/libpng_read_fuzzer.cc
-
     # Link order matters here
     c++ -std=c++11 -I $out/include -o $out/bin/libpng_read_fuzzer \
       contrib/oss-fuzz/libpng_read_fuzzer.cc $out/lib/libpng16.a -lz
+
+    # Copy corpus
+    cp -r ${./corpus} $out/corpus
   '';
+
+  passthru = {
+    programs = [ "libpng_read_fuzzer" ];
+  };
 }
