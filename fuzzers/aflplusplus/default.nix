@@ -48,4 +48,7 @@ aflplusplus // rec {
     sed "s|${aflplusplus}|$rep|g" ${aflplusplus}/bin/afl-fuzz > $out/bin/afl-fuzz
     chmod +x $out/bin/afl-fuzz
   '';
+  mkRunCommand = target: program: output: ''
+    ${aflplusplus}/bin/afl-fuzz -i ${target}/corpus/${program} -o ${output} -- ${target}/bin/${program}
+  '';
 }
