@@ -9,7 +9,7 @@
         pkgs = nixpkgs.legacyPackages.${system}.pkgs;
         magma = pkgs.callPackage ./magma { canaries = true; };
         fuzzers = [
-          "afl"
+          # "afl"
           "aflplusplus"
           # "llvm_lto"
         ];
@@ -63,6 +63,17 @@
           ln -s "${llvmPkgs.compiler-rt.out}/lib" "$rsrc/lib"
           ln -s "${llvmPkgs.compiler-rt.out}/share" "$rsrc/share"
         '';
+        mkRunScript = fuzzer: target: program: prefix: output:
+          pkgs.writeScriptBin "run.sh" (''
+            mkdir -p ${prefix}
+            if test -d ${prefix}/${output}; then
+              echo "Output directory ${prefix}/${output} already exists."
+              exit 1
+            fi
+          '' +
+          fuzzer.mkRunCommand target program "${prefix}/${output}"
+          );
+
         wrapClang =
           { llvmPkgs
           , cc ? llvmPkgs.clang-unwrapped
@@ -91,7 +102,7 @@
         callPackage = pkgs.lib.callPackageWith (pkgs // {
           inherit magma dummyDriver wrapClang aflPostInstall;
         });
-        buildSingleHelper = { f, t, buildImage ? true }:
+        buildSingleHelper = { f, t, buildImage ? false }:
           let
             fuzzer = callPackage ./fuzzers/${f} { };
             target = callPackage ./targets/${t} {
@@ -131,7 +142,7 @@
                 pkgs.symlinkJoin
                   {
                     inherit name;
-                    paths = [ fuzzer target ];
+                    paths = [ fuzzer.image target (mkRunScript fuzzer target (builtins.head target.programs) "$HOME/output" "$ID") ];
                   };
           };
         buildSingle = f: t: (buildSingleHelper { inherit f t; }).path;
@@ -143,9 +154,9 @@
           pkgs.linkFarm name BuildList;
         buildAll = buildMultiple "magma" fuzzers targets;
       in
-      rec {
+      {
         packages = flake-utils.lib.flattenTree rec {
-          default = buildAll;
+          default = buildSingle "depth" "libpng";
         };
       }
     );
