@@ -37,6 +37,8 @@ stdenv.mkDerivation {
     c++ -std=c++11 -I $out/include -o $out/bin/tiff_read_rgba_fuzzer \
         contrib/oss-fuzz/tiff_read_rgba_fuzzer.cc $out/lib/libtiffxx.a \
         $out/lib/libtiff.a -lz -ljpeg -llzma
+
+    cp -r ${./corpus} $out/corpus
   '';
 
   passthru = {
