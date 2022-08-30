@@ -30,8 +30,8 @@ stdenv.mkDerivation rec {
     "--disable-shared"
     "--with-http=no"
     "--with-python=no"
-    "--with-lzma=yes"
     "--with-threads=no"
+    "--with-lzma=yes"
   ];
 
   configurePhase = ''
@@ -42,15 +42,16 @@ stdenv.mkDerivation rec {
     "libxml2_xml_read_memory_fuzzer"
     "libxml2_xml_reader_for_file_fuzzer"
   ];
-  programs = [
+  programs = extras ++ [
     "xmllint"
-  ] ++ extras;
+  ];
 
   postInstall = ''
+    cp -r ${./corpus} $out/corpus
     cp xmllint $out/bin
 
     for f in ${builtins.concatStringsSep " " extras}; do
-        c++ -std=c++11 -I ${./src} -I $out/include/libxml2 -o $out/$f \
+        c++ -std=c++11 -I ${./src} -I $out/include/libxml2 -o $out/bin/$f \
           ${./src}/$f.cc $out/lib/libxml2.a -lz -llzma
     done
   '';
