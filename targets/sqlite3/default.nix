@@ -33,6 +33,8 @@ stdenv.mkDerivation rec {
     "-DSQLITE_PRINTF_PRECISION_LIMIT=1048576"
   ];
 
+  programs = [ "sqlite3_fuzz" ];
+
   buildFlags = [ "sqlite3.o" ];
 
   postInstall = ''
@@ -42,6 +44,4 @@ stdenv.mkDerivation rec {
     c++ -pthread -o $out/bin/${builtins.head programs} \
       ossfuzz.o $out/lib/libsqlite3.a -ldl -lm
   '';
-
-  passthru.programs = [ "sqlite3_fuzz" ];
 }
