@@ -17,6 +17,7 @@ fuzzDepth // {
     # inherit (fuzzDepth) cflags ldflags;
     llvmPkgs = pkgs.llvmPackages_14;
     cflags = [
+      "-flto"
       "-g"
       "-Og"
       "-fpass-plugin=${fuzzDepth}/lib/libpass.so"
@@ -28,6 +29,8 @@ fuzzDepth // {
     ];
   });
   mkRunCommand = target: program: output: ''
-    ${target}/bin/${program} ${output}
+    for p in ${target}/corpus/${program}/*; do
+      ${target}/bin/${program} $p
+    done
   '';
 }
