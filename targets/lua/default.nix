@@ -22,7 +22,10 @@ stdenv.mkDerivation {
 
   installPhase = ''
     mkdir -p $out/bin $out/lib
+    cp -r ${./corpus} $out/corpus
     cp liblua.a $out/lib
     cp lua $out/bin
   '';
+
+  passthru.programs = [ "lua" ];
 }
