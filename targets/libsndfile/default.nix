@@ -58,6 +58,7 @@ stdenv.mkDerivation {
   buildFlags = [ "ossfuzz/sndfile_fuzzer" ];
 
   postInstall = ''
+    cp -r ${./corpus} $out/corpus
     cp ossfuzz/sndfile_fuzzer $out/bin
   '';
 
