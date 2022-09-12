@@ -66,6 +66,7 @@ stdenv.mkDerivation rec {
 
   installPhase = ''
     mkdir -p $out/bin
+    cp -r ${./corpus} $out/corpus
 
     for p in ${builtins.concatStringsSep " " programs}; do
         cp fuzz/$p $out/bin/$p
