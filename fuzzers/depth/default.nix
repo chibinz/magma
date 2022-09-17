@@ -3,7 +3,7 @@
 }:
 
 let
-  llvmPkgs = pkgs.llvmPackages_14;
+  llvmPkgs = pkgs.llvmPackages_git;
   fuzzDepth = llvmPkgs.stdenv.mkDerivation {
     name = "FuzzDepth";
     src = /home/chibinzhang/FuzzDepth;
@@ -13,9 +13,8 @@ let
 in
 fuzzDepth // {
   image = fuzzDepth;
-  stdenv = pkgs.overrideCC pkgs.llvmPackages_14.stdenv (wrapClang {
-    # inherit (fuzzDepth) cflags ldflags;
-    llvmPkgs = pkgs.llvmPackages_14;
+  stdenv = pkgs.overrideCC llvmPkgs.stdenv (wrapClang {
+    inherit llvmPkgs;
     cflags = [
       "-flto"
       "-g"
@@ -24,6 +23,7 @@ fuzzDepth // {
       "-fno-discard-value-names"
     ];
     ldflags = [
+      "--load-pass-plugin=${fuzzDepth}/lib/libpass.so"
       "${fuzzDepth}/lib/libdriver.a"
       "${fuzzDepth}/lib/rt.o"
     ];
